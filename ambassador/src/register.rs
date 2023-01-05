@@ -67,7 +67,7 @@ pub fn build_register_trait(original_item: &ItemTrait) -> TokenStream {
         used_recievers.ref_mut,
     );
     let mut register_trait = quote! {
-        #[doc = concat!("A macro to be used by [`ambassador::Delegate`] to delegate [`", stringify!(#trait_ident), "`]")]
+        #[doc(hidden)]
         #[macro_export]
         macro_rules! #macro_name {
             (body_struct(<#gen_matcher>, $ty:ty, $field_ident:tt)) => {
@@ -108,10 +108,12 @@ pub fn build_register_trait(original_item: &ItemTrait) -> TokenStream {
         let enum_name = quote::format_ident!("{}_body_enum", macro_name);
         let struct_name = quote::format_ident!("{}_body_single_struct", macro_name);
         let legacy_macros = quote! {
+            #[doc(hidden)]
             #[macro_export]
             macro_rules! #struct_name {
                 ($field_ident:tt) => {#macro_name!{body_struct(<>, (), $field_ident)}};
             }
+            #[doc(hidden)]
             #[macro_export]
             macro_rules! #enum_name {
                 ($( $variants:path ),+) => {#macro_name!{body_enum(<>, (), (()), ($( $variants),*))}};
